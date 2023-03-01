@@ -1,5 +1,6 @@
 
 package View;
+import javax.swing.JOptionPane;
 
 public class Register extends javax.swing.JPanel {
 
@@ -10,6 +11,7 @@ public class Register extends javax.swing.JPanel {
     }
 
     @SuppressWarnings("unchecked")
+    
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -96,9 +98,50 @@ public class Register extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private boolean checkConfirm(){
+        
+        if (passwordFld.getText().equals(confpassFld.getText())){
+            return true;
+            
+        }else{
+            JOptionPane.showMessageDialog(null, "Passwords do not match.");
+            passwordFld.setText("");
+            confpassFld.setText("");
+            return false;
+        }
+        
+    }
+    
+    private boolean checkPasswordStrength(){
+        
+        if (passwordFld.getText().matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=_!])(?=\\S+$).{8,}$")){
+            return true;
+        }else {
+             String message = "<html><body><h1>WARNING: Weak Password</h1> \n Your password must contain: \n" +
+            " At least one digit\n" +
+            " At least one lowercase letter \n" +
+            " At least one uppercase letter \n" +
+            " At least one special character\n" +
+            " No whitespace/s \n" +
+            " At least 8 characters long \n";
+        
+            JOptionPane.showMessageDialog(null, message);
+            return false;
+        }
+         
+        
+    }
     private void registerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerBtnActionPerformed
-        frame.registerAction(usernameFld.getText(), passwordFld.getText(), confpassFld.getText());
-        frame.loginNav();
+        
+        
+        if (checkConfirm() && checkPasswordStrength()){
+            frame.registerAction(usernameFld.getText(),passwordFld.getText(),confpassFld.getText());
+            frame.loginNav();
+            
+        }else{
+            passwordFld.setText("");
+            confpassFld.setText("");
+        }
     }//GEN-LAST:event_registerBtnActionPerformed
 
     private void backBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backBtnActionPerformed
