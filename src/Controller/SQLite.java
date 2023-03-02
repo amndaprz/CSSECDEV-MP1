@@ -308,68 +308,88 @@ public class SQLite {
 //                System.out.println("db_user: " + rs.getString("username") + " db_pass: " + rs.getString("password"));
                
                  if(rs.getString("username").equals(username)){
-                    
-                    if(rs.getString("password").equals(password)){
-                        
-                         String lockstr= rs.getString("locktimer");
+                     //USer exists, whether correct password or not
+                      String lockstr= rs.getString("locktimer");
                         if (lockstr != null) {
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
-                            Date parsedDate = dateFormat.parse(lockstr);
-                            Timestamp checkLocked = new Timestamp(parsedDate.getTime());
-
-                            if (checkLocked != null && Instant.now().isBefore(checkLocked.toInstant())) {
-                                System.out.println("Account is locked. Try again later. REMOVE LATER" + rs.getString("locked"));
-                                
+                            Timestamp checkLocked = Timestamp.valueOf(lockstr);
+                            if (Instant.now().isBefore(checkLocked.toInstant())) {
+                                System.out.println("Account is locked. Try again later. Unlocked @: " + checkLocked);
                                 return 3;
+                            } else{
+                                if(rs.getString("password").equals(password)){
+                                      //Successful login
+                                    //Reset log
+                                    String update = "UPDATE users SET locked = ? WHERE username = ?";
+                                    PreparedStatement pstmt = conn.prepareStatement(update);
+
+                                    pstmt.setInt(1, 0);
+                                    pstmt.setString(2, username);
+
+                                    int n_rows = pstmt.executeUpdate();
+                                    pstmt.close();
+                                     System.out.println("user found CORRECT");
+                                    return 4;
+                                }
                             }
                         }
+                    //User exists, wrong password
+                        if(!rs.getString("password").equals(password)){
+
+                            //if max logs, add timer
+                            if (rs.getInt("locked") == MAX_LOGS-1){
+                            // Set lock timer
+                            String locked_until = Timestamp.from(Instant.now().plusSeconds(5)).toString();
+                            System.out.println("user found MAX"  + locked_until);
+    //                        //set timer to additional 60
+                            String lock = "UPDATE users SET locked = ?, locktimer = ? WHERE username = ?";
+                            PreparedStatement pstmt = conn.prepareStatement(lock);
+                            pstmt.setInt(1,2);
+                            pstmt.setString(2, locked_until);
+                            pstmt.setString(3, username);
+                            pstmt.executeUpdate();
+                            pstmt.close();
+                            return 3;
+                            } 
+                            //if not max logs, add locked
+                            else {
+
+                                //update locked
+                                int locked = rs.getInt("locked");
+                                locked = locked + 1;
+                                String update = "UPDATE users SET locked = ? WHERE username = ?";
+                                PreparedStatement pstmt = conn.prepareStatement(update);
+
+                                pstmt.setInt(1, locked);
+                                pstmt.setString(2, username);
+
+                                int n_rows = pstmt.executeUpdate();
+                                pstmt.close();
+                                 System.out.println("user found WRONG");
+                                return locked;
+                            }
                         
-                        if (rs.getInt("locked") == MAX_LOGS){
-                         
-                        System.out.println("user found MAX");
-//                        //set timer to additional 60
-                        String lock = "UPDATE users SET locked = ?, locktimer = ?, role = ? WHERE username = ?";
-                        PreparedStatement pstmt = conn.prepareStatement(lock);
-                        pstmt.setInt(1,2);
-                        pstmt.setString(2, Timestamp.from(Instant.now().plusSeconds(5)).toString());
-                        pstmt.setString(3, "Disabled");
-                        pstmt.setString(4, username);
-                        pstmt.executeUpdate();
-                        pstmt.close();
-                        return 3;
-                    }
                         
-                        //Reset log
-                        String update = "UPDATE users SET locked = ? WHERE username = ?";
-                        PreparedStatement pstmt = conn.prepareStatement(update);
                         
-                        pstmt.setInt(1, 0);
-                        pstmt.setString(2, username);
+                        }// End of wrong password
                         
-                        int n_rows = pstmt.executeUpdate();
-                        pstmt.close();
-                        System.out.println("Updated n_rows: " + n_rows);
-                         System.out.println("user found CORRECT");
-                        return 4;
-                    }else{
-                        //update locked
-                        int locked = rs.getInt("locked");
-                        locked = locked + 1;
-                        String update = "UPDATE users SET locked = ? WHERE username = ?";
-                        PreparedStatement pstmt = conn.prepareStatement(update);
-                        
-                        pstmt.setInt(1, locked);
-                        pstmt.setString(2, username);
-                        
-                        int n_rows = pstmt.executeUpdate();
-                        pstmt.close();
-                        System.out.println("Updated n_rows: " + n_rows);
-                         System.out.println("user found WRONG");
-                        return locked;
-                          
-                    }
-                }
+                        //start of correct password
+                        else {
+                            //Successful login
+                            //Reset log
+                            String update = "UPDATE users SET locked = ? WHERE username = ?";
+                            PreparedStatement pstmt = conn.prepareStatement(update);
+
+                            pstmt.setInt(1, 0);
+                            pstmt.setString(2, username);
+
+                            int n_rows = pstmt.executeUpdate();
+                            pstmt.close();
+                             System.out.println("user found CORRECT");
+                            return 4;
+                        }
+                 }
             }
+                    
             
         } catch (Exception ex) {  System.out.println(ex);}
         
