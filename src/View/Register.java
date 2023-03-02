@@ -158,7 +158,8 @@ public class Register extends javax.swing.JPanel {
             usernameFld.setText("");
             passwordFld.setText("");
             confpassFld.setText("");
-                JOptionPane.showMessageDialog(null, "Username not available");
+            JOptionPane.showMessageDialog(null, message);
+            message = message_default;
         }
         
     }//GEN-LAST:event_registerBtnActionPerformed
