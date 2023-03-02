@@ -300,9 +300,9 @@ public class SQLite {
             ResultSet rs = stmt.executeQuery(sql)){
             
             while (rs.next()) {
-            if (rs.getString("username").equals(username))
-                return true;
-            }
+                if (rs.getString("username").equals(username))
+                    return true;
+                }
             
        } catch (Exception ex) {  System.out.println(ex);}
         
@@ -320,12 +320,13 @@ public class SQLite {
             ResultSet rs = stmt.executeQuery(sql)){
             
             while (rs.next()) {
-//                System.out.println("username: " + username + " pass: " +  password);
-//                System.out.println("db_user: " + rs.getString("username") + " db_pass: " + rs.getString("password"));
+                System.out.println("username: " + username + " pass: " +  password);
+                System.out.println("db_user: " + rs.getString("username") + " db_pass: " + rs.getString("password"));
                
                  if(rs.getString("username").equals(username)){
-                     //USer exists, whether correct password or not
+                     //User exists, whether correct password or not
                       String lockstr= rs.getString("locktimer");
+                      System.out.println("lock str = " + lockstr);
                         if (lockstr != null) {
                             Timestamp checkLocked = Timestamp.valueOf(lockstr);
                             if (Instant.now().isBefore(checkLocked.toInstant())) {

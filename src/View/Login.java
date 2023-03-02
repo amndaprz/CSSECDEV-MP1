@@ -2,6 +2,8 @@
 package View;
 
 import Controller.SQLite;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.JOptionPane;
 
 public class Login extends javax.swing.JPanel {
@@ -9,6 +11,7 @@ public class Login extends javax.swing.JPanel {
     public Frame frame;
     public SQLite sqlite;
     
+    public int attempts = 0;
     public String username;
     public String password;
     public int userRole;
@@ -41,6 +44,11 @@ public class Login extends javax.swing.JPanel {
         usernameFld.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         usernameFld.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         usernameFld.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "USERNAME", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12))); // NOI18N
+        usernameFld.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                usernameFldActionPerformed(evt);
+            }
+        });
 
         passwordFld.setBackground(new java.awt.Color(240, 240, 240));
         passwordFld.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -103,27 +111,37 @@ public class Login extends javax.swing.JPanel {
     private void loginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginBtnActionPerformed
         username = usernameFld.getText();
         password = passwordFld.getText();
+        
         boolean authResult = false;
                 
         if(username.isEmpty() || password.isEmpty()){
             //dialog box cannot be empty
              JOptionPane.showMessageDialog(null, "Fields cannot be empty");
             
-        }else
+        }else{
             authResult = sqlite.checkUsers(username, password);
             
-     
 
-        if(authResult){
-            userRole = sqlite.getRole(username);
-            frame.mainNav(userRole);
-        }else {
-            // Error message
-            JOptionPane.showMessageDialog(null, "Login Failed: Invalid username/password");
-            usernameFld.setText("");
-            passwordFld.setText("");  
+            if(authResult){
+                userRole = sqlite.getRole(username);
+                frame.mainNav(userRole);
+                usernameFld.setText("");
+                passwordFld.setText("");
+                attempts = 0;
+            }else {
+                // Error message
+                JOptionPane.showMessageDialog(null, "Login Failed: Invalid username/password");
+                usernameFld.setText("");
+                passwordFld.setText("");  
+
+                if(attempts == MAX_ATTEMPTS){
+                    JOptionPane.showMessageDialog(null, "Login Disabled. Please Contact the administrator");
+                    usernameFld.setEditable(false);
+                    passwordFld.setEditable(false);
+                }
+            }
         }
-        
+        attempts +=1;
         
         
     }//GEN-LAST:event_loginBtnActionPerformed
@@ -137,6 +155,10 @@ public class Login extends javax.swing.JPanel {
         
         
     }//GEN-LAST:event_passwordFldActionPerformed
+
+    private void usernameFldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameFldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_usernameFldActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

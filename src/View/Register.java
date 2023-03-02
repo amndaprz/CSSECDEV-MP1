@@ -19,6 +19,7 @@ public class Register extends javax.swing.JPanel {
     public String message = message_default;
     public Register() {
         initComponents();
+        sqlite = new SQLite();
     }
 
     @SuppressWarnings("unchecked")
@@ -115,7 +116,7 @@ public class Register extends javax.swing.JPanel {
             return true;
             
         }else{
-            message = "Passowords do not match.";
+            message = "Passwords do not match.";
             return false;
         }
         
@@ -134,17 +135,32 @@ public class Register extends javax.swing.JPanel {
     }
     private void registerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerBtnActionPerformed
         
+        boolean a,b,c;
+        a = checkConfirm();
+        b = checkPasswordStrength();
+        System.out.println(usernameFld.getText());
+        String d = usernameFld.getText();
+        c = sqlite.checkUsername(d);
         
-        if (checkConfirm() && checkPasswordStrength() && !sqlite.checkUsername(usernameFld.getText())){
-            frame.registerAction(usernameFld.getText(),passwordFld.getText(),confpassFld.getText());
-            frame.loginNav();
-            
-        }else{
+        if(!sqlite.checkUsername(usernameFld.getText())){
+            if (checkConfirm() && checkPasswordStrength()){
+                System.out.println(a + " " + b + " " + c);
+                frame.registerAction(usernameFld.getText(),passwordFld.getText(),confpassFld.getText());
+                frame.loginNav();
+
+            }else{
+                passwordFld.setText("");
+                confpassFld.setText("");
+                JOptionPane.showMessageDialog(null, message);
+                message = message_default;
+            }
+        }else {
+            usernameFld.setText("");
             passwordFld.setText("");
             confpassFld.setText("");
-            JOptionPane.showMessageDialog(null, message);
-            message = message_default;
+                JOptionPane.showMessageDialog(null, "Username not available");
         }
+        
     }//GEN-LAST:event_registerBtnActionPerformed
 
     private void backBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backBtnActionPerformed
