@@ -107,35 +107,24 @@ public class Login extends javax.swing.JPanel {
                 
         if(username.isEmpty() || password.isEmpty()){
             //dialog box cannot be empty
+             JOptionPane.showMessageDialog(null, "Fields cannot be empty");
             
-        }else{
-//            sqlite.dropUserTable();
-//            sqlite.createUserTable();
-            int n = sqlite.checkUsers(username, password);
-            switch(n){
-                case 1: 
-                case 2: //print dialog box warning how many attempts left
-                    JOptionPane.showMessageDialog(null, 3 - n + " attempt/s left.");
-                    break;
-                case 3: //account locked please wait 60 seconds
-                    JOptionPane.showMessageDialog(null, "Account has been locked. Please wait for 60 seconds before retrying");
-                    break;
-                case 4: authResult = true;
-                    break;
-                case 5: //unknown
-            }            
-        }
-  
+        }else
+            authResult = sqlite.checkUsers(username, password);
+            
+     
 
         if(authResult){
             userRole = sqlite.getRole(username);
             frame.mainNav(userRole);
         }else {
             // Error message
+            JOptionPane.showMessageDialog(null, "Login Failed: Invalid username/password");
+            usernameFld.setText("");
+            passwordFld.setText("");  
         }
         
-        usernameFld.setText("");
-        passwordFld.setText("");
+        
         
     }//GEN-LAST:event_loginBtnActionPerformed
 

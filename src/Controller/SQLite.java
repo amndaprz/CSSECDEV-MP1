@@ -289,13 +289,29 @@ public class SQLite {
         return users;
     }
     
-    //RETURN:
-    // 1 :Log attempt Warning
-    // 2: Log Attempt Warning
-    // 3: FINAL Log attempt + add timestamp
-    // 4: success
-    // 5: Unknown error
-    public int checkUsers(String username, String password){
+    
+    //returns true if username exists
+     public boolean checkUsername(String username){
+        String sql = "SELECT username FROM users";
+        ArrayList<User> users = new ArrayList<User>();
+       
+       try (Connection conn = DriverManager.getConnection(driverURL);
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)){
+            
+            while (rs.next()) {
+            if (rs.getString("username").equals(username))
+                return true;
+            }
+            
+       } catch (Exception ex) {  System.out.println(ex);}
+        
+        return false;
+    }
+     
+     
+    //returns false if unsuccesful login, true if successful
+    public boolean checkUsers(String username, String password){
         String sql = "SELECT id, username, password, role, locked, locktimer FROM users";
         ArrayList<User> users = new ArrayList<User>();
        
@@ -313,8 +329,8 @@ public class SQLite {
                         if (lockstr != null) {
                             Timestamp checkLocked = Timestamp.valueOf(lockstr);
                             if (Instant.now().isBefore(checkLocked.toInstant())) {
-                                System.out.println("Account is locked. Try again later. Unlocked @: " + checkLocked);
-                                return 3;
+                                
+                                return false;
                             } else{
                                 if(rs.getString("password").equals(password)){
                                       //Successful login
@@ -324,23 +340,19 @@ public class SQLite {
 
                                     pstmt.setInt(1, 0);
                                     pstmt.setString(2, username);
-
-                                    int n_rows = pstmt.executeUpdate();
+                                    pstmt.executeUpdate();
                                     pstmt.close();
-                                     System.out.println("user found CORRECT");
-                                    return 4;
+                                    
+                                    return true;
                                 }
                             }
                         }
                     //User exists, wrong password
                         if(!rs.getString("password").equals(password)){
-
                             //if max logs, add timer
                             if (rs.getInt("locked") == MAX_LOGS-1){
                             // Set lock timer
-                            String locked_until = Timestamp.from(Instant.now().plusSeconds(5)).toString();
-                            System.out.println("user found MAX"  + locked_until);
-    //                        //set timer to additional 60
+                            String locked_until = Timestamp.from(Instant.now().plusSeconds(5)).toString(); // additional 60 seconds
                             String lock = "UPDATE users SET locked = ?, locktimer = ? WHERE username = ?";
                             PreparedStatement pstmt = conn.prepareStatement(lock);
                             pstmt.setInt(1,2);
@@ -348,7 +360,7 @@ public class SQLite {
                             pstmt.setString(3, username);
                             pstmt.executeUpdate();
                             pstmt.close();
-                            return 3;
+                            return false;
                             } 
                             //if not max logs, add locked
                             else {
@@ -361,11 +373,9 @@ public class SQLite {
 
                                 pstmt.setInt(1, locked);
                                 pstmt.setString(2, username);
-
-                                int n_rows = pstmt.executeUpdate();
+                                pstmt.executeUpdate();
                                 pstmt.close();
-                                 System.out.println("user found WRONG");
-                                return locked;
+                                return false;
                             }
                         
                         
@@ -385,7 +395,7 @@ public class SQLite {
                             int n_rows = pstmt.executeUpdate();
                             pstmt.close();
                              System.out.println("user found CORRECT");
-                            return 4;
+                            return true;
                         }
                  }
             }
@@ -393,7 +403,7 @@ public class SQLite {
             
         } catch (Exception ex) {  System.out.println(ex);}
         
-        return 5;
+        return false;
     }
  
     public int getRole(String username){

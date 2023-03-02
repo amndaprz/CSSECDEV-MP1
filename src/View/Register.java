@@ -1,11 +1,22 @@
 
 package View;
 import javax.swing.JOptionPane;
+import Controller.SQLite;
 
 public class Register extends javax.swing.JPanel {
-
-    public Frame frame;
     
+    
+    public SQLite sqlite;
+    public Frame frame;
+    public String message_default = "<html><body><h1>Invalid username/password</h1> \n Your password must contain: \n" +
+            " At least one digit\n" +
+            " At least one lowercase letter \n" +
+            " At least one uppercase letter \n" +
+            " At least one special character\n" +
+            " No whitespace/s \n" +
+            " At least 8 characters long \n";
+    
+    public String message = message_default;
     public Register() {
         initComponents();
     }
@@ -104,9 +115,7 @@ public class Register extends javax.swing.JPanel {
             return true;
             
         }else{
-            JOptionPane.showMessageDialog(null, "Passwords do not match.");
-            passwordFld.setText("");
-            confpassFld.setText("");
+            message = "Passowords do not match.";
             return false;
         }
         
@@ -114,33 +123,27 @@ public class Register extends javax.swing.JPanel {
     
     private boolean checkPasswordStrength(){
         
-        if (passwordFld.getText().matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=_!])(?=\\S+$).{8,}$")){
+        if (passwordFld.getText().matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=_!])(?=\\S+$).{8,}$"))
             return true;
-        }else {
-             String message = "<html><body><h1>WARNING: Weak Password</h1> \n Your password must contain: \n" +
-            " At least one digit\n" +
-            " At least one lowercase letter \n" +
-            " At least one uppercase letter \n" +
-            " At least one special character\n" +
-            " No whitespace/s \n" +
-            " At least 8 characters long \n";
-        
-            JOptionPane.showMessageDialog(null, message);
+        else {
             return false;
         }
+        
          
         
     }
     private void registerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerBtnActionPerformed
         
         
-        if (checkConfirm() && checkPasswordStrength()){
+        if (checkConfirm() && checkPasswordStrength() && !sqlite.checkUsername(usernameFld.getText())){
             frame.registerAction(usernameFld.getText(),passwordFld.getText(),confpassFld.getText());
             frame.loginNav();
             
         }else{
             passwordFld.setText("");
             confpassFld.setText("");
+            JOptionPane.showMessageDialog(null, message);
+            message = message_default;
         }
     }//GEN-LAST:event_registerBtnActionPerformed
 
