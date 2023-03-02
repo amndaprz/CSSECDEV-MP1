@@ -7,14 +7,23 @@ import Model.User;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
+    
+
+
 
 public class SQLite {
     
     public int DEBUG_MODE = 0;
     String driverURL = "jdbc:sqlite:" + "database.db";
+    public static int MAX_LOGS = 3;
     
     public void createNewDatabase() {
         try (Connection conn = DriverManager.getConnection(driverURL)) {
@@ -81,12 +90,13 @@ public class SQLite {
     }
      
     public void createUserTable() {
-        String sql = "CREATE TABLE IF NOT EXISTS users (\n"
+        String sql = " CREATE TABLE IF NOT EXISTS users (\n"
             + " id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
             + " username TEXT NOT NULL UNIQUE,\n"
             + " password TEXT NOT NULL,\n"
             + " role INTEGER DEFAULT 2,\n"
-            + " locked INTEGER DEFAULT 0\n"
+            + " locked INTEGER DEFAULT 0,\n"
+            + " locktimer text DEFAULT NULL \n"
             + ");";
 
         try (Connection conn = DriverManager.getConnection(driverURL);
@@ -279,29 +289,93 @@ public class SQLite {
         return users;
     }
     
-    public boolean checkUsers(String username, String password){
-        String sql = "SELECT id, username, password, role, locked FROM users";
+    //RETURN:
+    // 1 :Log attempt Warning
+    // 2: Log Attempt Warning
+    // 3: FINAL Log attempt + add timestamp
+    // 4: success
+    // 5: Unknown error
+    public int checkUsers(String username, String password){
+        String sql = "SELECT id, username, password, role, locked, locktimer FROM users";
         ArrayList<User> users = new ArrayList<User>();
-        
-        System.out.println("username: " + username + " pass: " +  password);
-        
-        try (Connection conn = DriverManager.getConnection(driverURL);
+       
+       try (Connection conn = DriverManager.getConnection(driverURL);
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql)){
             
             while (rs.next()) {
 //                System.out.println("username: " + username + " pass: " +  password);
 //                System.out.println("db_user: " + rs.getString("username") + " db_pass: " + rs.getString("password"));
-                if(rs.getString("username").equals(username)){
+               
+                 if(rs.getString("username").equals(username)){
+                    
                     if(rs.getString("password").equals(password)){
-                        return true;
+                        
+                         String lockstr= rs.getString("locktimer");
+                        if (lockstr != null) {
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+                            Date parsedDate = dateFormat.parse(lockstr);
+                            Timestamp checkLocked = new Timestamp(parsedDate.getTime());
+
+                            if (checkLocked != null && Instant.now().isBefore(checkLocked.toInstant())) {
+                                System.out.println("Account is locked. Try again later. REMOVE LATER" + rs.getString("locked"));
+                                
+                                return 3;
+                            }
+                        }
+                        
+                        if (rs.getInt("locked") == MAX_LOGS){
+                         
+                        System.out.println("user found MAX");
+//                        //set timer to additional 60
+                        String lock = "UPDATE users SET locked = ?, locktimer = ?, role = ? WHERE username = ?";
+                        PreparedStatement pstmt = conn.prepareStatement(lock);
+                        pstmt.setInt(1,2);
+                        pstmt.setString(2, Timestamp.from(Instant.now().plusSeconds(5)).toString());
+                        pstmt.setString(3, "Disabled");
+                        pstmt.setString(4, username);
+                        pstmt.executeUpdate();
+                        pstmt.close();
+                        return 3;
+                    }
+                        
+                        //Reset log
+                        String update = "UPDATE users SET locked = ? WHERE username = ?";
+                        PreparedStatement pstmt = conn.prepareStatement(update);
+                        
+                        pstmt.setInt(1, 0);
+                        pstmt.setString(2, username);
+                        
+                        int n_rows = pstmt.executeUpdate();
+                        pstmt.close();
+                        System.out.println("Updated n_rows: " + n_rows);
+                         System.out.println("user found CORRECT");
+                        return 4;
+                    }else{
+                        //update locked
+                        int locked = rs.getInt("locked");
+                        locked = locked + 1;
+                        String update = "UPDATE users SET locked = ? WHERE username = ?";
+                        PreparedStatement pstmt = conn.prepareStatement(update);
+                        
+                        pstmt.setInt(1, locked);
+                        pstmt.setString(2, username);
+                        
+                        int n_rows = pstmt.executeUpdate();
+                        pstmt.close();
+                        System.out.println("Updated n_rows: " + n_rows);
+                         System.out.println("user found WRONG");
+                        return locked;
+                          
                     }
                 }
             }
-        } catch (Exception ex) {}
-        return false;
+            
+        } catch (Exception ex) {  System.out.println(ex);}
+        
+        return 5;
     }
-    
+ 
     public int getRole(String username){
          String sql = "SELECT id, username, password, role, locked FROM users";
         ArrayList<User> users = new ArrayList<User>();

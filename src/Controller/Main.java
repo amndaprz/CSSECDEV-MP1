@@ -41,7 +41,7 @@ public class Main {
 //        sqlite.dropHistoryTable();
 //        sqlite.dropLogsTable();
 //        sqlite.dropProductTable();
-//        sqlite.dropUserTable();
+        sqlite.dropUserTable();
 //        
 //        // Create users table if not exist
         sqlite.createHistoryTable();
@@ -70,7 +70,6 @@ public class Main {
         sqlite.addUser("staff", "qwerty1234", 3);
         sqlite.addUser("client1", "qwerty1234", 2);
         sqlite.addUser("client2", "qwerty1234", 2);
-//        
 //        
 //        // Get Histories
 //        ArrayList<History> histories = sqlite.getHistory();

@@ -2,7 +2,7 @@
 package View;
 
 import Controller.SQLite;
-import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 public class Login extends javax.swing.JPanel {
 
@@ -12,6 +12,7 @@ public class Login extends javax.swing.JPanel {
     public String username;
     public String password;
     public int userRole;
+    public static final int MAX_ATTEMPTS = 3;
     
     public Login() {
         initComponents();
@@ -105,9 +106,24 @@ public class Login extends javax.swing.JPanel {
         boolean authResult = false;
                 
         if(username.isEmpty() || password.isEmpty()){
+            //dialog box cannot be empty
             
         }else{
-            authResult = sqlite.checkUsers(username, password);
+//            sqlite.dropUserTable();
+//            sqlite.createUserTable();
+            int n = sqlite.checkUsers(username, password);
+            switch(n){
+                case 1: 
+                case 2: //print dialog box warning how many attempts left
+                    JOptionPane.showMessageDialog(null, 3 - n + " attempt/s left.");
+                    break;
+                case 3: //account locked please wait 60 seconds
+                    JOptionPane.showMessageDialog(null, "Account has been locked. Please wait for 60 seconds before retrying");
+                    break;
+                case 4: authResult = true;
+                    break;
+                case 5: //unknown
+            }            
         }
   
 
@@ -129,6 +145,8 @@ public class Login extends javax.swing.JPanel {
 
     private void passwordFldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordFldActionPerformed
         // TODO add your handling code here:
+        
+        
     }//GEN-LAST:event_passwordFldActionPerformed
 
 
