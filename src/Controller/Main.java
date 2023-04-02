@@ -41,7 +41,7 @@ public class Main {
 //        sqlite.dropHistoryTable();
 //        sqlite.dropLogsTable();
 //        sqlite.dropProductTable();
-        sqlite.dropUserTable();
+//        sqlite.dropUserTable();
 //        
 //        // Create users table if not exist
         sqlite.createHistoryTable();
@@ -54,6 +54,8 @@ public class Main {
 //        sqlite.addHistory("manager", "Firewall", 1, "2019-04-03 14:30:01.000");
 //        sqlite.addHistory("staff", "Scanner", 1, "2019-04-03 14:30:02.000");
 //        
+
+
 //        // Add sample logs
 //        sqlite.addLogs("NOTICE", "admin", "User creation successful", new Timestamp(new Date().getTime()).toString());
 //        sqlite.addLogs("NOTICE", "manager", "User creation successful", new Timestamp(new Date().getTime()).toString());
@@ -63,7 +65,7 @@ public class Main {
 //        sqlite.addProduct("Antivirus", 5, 500.0);
 //        sqlite.addProduct("Firewall", 3, 1000.0);
 //        sqlite.addProduct("Scanner", 10, 100.0);
-//
+////
 //        // Add sample users
         sqlite.addUser("admin", "qwerty1234" , 5);
         sqlite.addUser("manager", "qwerty1234", 4);
@@ -72,33 +74,33 @@ public class Main {
         sqlite.addUser("client2", "qwerty1234", 2);
 //        
 //        // Get Histories
-//        ArrayList<History> histories = sqlite.getHistory();
-//        for(int nCtr = 0; nCtr < histories.size(); nCtr++){
-//            System.out.println("===== History " + histories.get(nCtr).getId() + " =====");
-//            System.out.println(" Username: " + histories.get(nCtr).getUsername());
-//            System.out.println(" Name: " + histories.get(nCtr).getName());
-//            System.out.println(" Stock: " + histories.get(nCtr).getStock());
-//            System.out.println(" Timestamp: " + histories.get(nCtr).getTimestamp());
-//        }
-//        
+        ArrayList<History> histories = sqlite.getHistory();
+        for(int nCtr = 0; nCtr < histories.size(); nCtr++){
+            System.out.println("===== History " + histories.get(nCtr).getId() + " =====");
+            System.out.println(" Username: " + histories.get(nCtr).getUsername());
+            System.out.println(" Name: " + histories.get(nCtr).getName());
+            System.out.println(" Stock: " + histories.get(nCtr).getStock());
+            System.out.println(" Timestamp: " + histories.get(nCtr).getTimestamp());
+        }
+        
 //        // Get Logs
-//        ArrayList<Logs> logs = sqlite.getLogs();
-//        for(int nCtr = 0; nCtr < logs.size(); nCtr++){
-//            System.out.println("===== Logs " + logs.get(nCtr).getId() + " =====");
-//            System.out.println(" Username: " + logs.get(nCtr).getEvent());
-//            System.out.println(" Password: " + logs.get(nCtr).getUsername());
-//            System.out.println(" Role: " + logs.get(nCtr).getDesc());
-//            System.out.println(" Timestamp: " + logs.get(nCtr).getTimestamp());
-//        }
+        ArrayList<Logs> logs = sqlite.getLogs();
+        for(int nCtr = 0; nCtr < logs.size(); nCtr++){
+            System.out.println("===== Logs " + logs.get(nCtr).getId() + " =====");
+            System.out.println(" Username: " + logs.get(nCtr).getEvent());
+            System.out.println(" Password: " + logs.get(nCtr).getUsername());
+            System.out.println(" Role: " + logs.get(nCtr).getDesc());
+            System.out.println(" Timestamp: " + logs.get(nCtr).getTimestamp());
+        }
 //        
 //        // Get Products
-//        ArrayList<Product> products = sqlite.getProduct();
-//        for(int nCtr = 0; nCtr < products.size(); nCtr++){
-//            System.out.println("===== Product " + products.get(nCtr).getId() + " =====");
-//            System.out.println(" Name: " + products.get(nCtr).getName());
-//            System.out.println(" Stock: " + products.get(nCtr).getStock());
-//            System.out.println(" Price: " + products.get(nCtr).getPrice());
-//        }
+        ArrayList<Product> products = sqlite.getProduct();
+        for(int nCtr = 0; nCtr < products.size(); nCtr++){
+            System.out.println("===== Product " + products.get(nCtr).getId() + " =====");
+            System.out.println(" Name: " + products.get(nCtr).getName());
+            System.out.println(" Stock: " + products.get(nCtr).getStock());
+            System.out.println(" Price: " + products.get(nCtr).getPrice());
+        }
 //        // Get users
         ArrayList<User> users = sqlite.getUsers();
         

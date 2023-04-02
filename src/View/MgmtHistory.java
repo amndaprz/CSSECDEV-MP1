@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import View.Login;
 
 /**
  *
@@ -35,8 +36,8 @@ public class MgmtHistory extends javax.swing.JPanel {
         table.getColumnModel().getColumn(5).setCellRenderer(rightAlign);
         
 //        UNCOMMENT TO DISABLE BUTTONS
-//        searchBtn.setVisible(false);
-//        reportBtn.setVisible(false);
+        searchBtn.setVisible(false);
+//        reloadBtn.setVisible(false);
     }
 
     public void init(){
@@ -48,8 +49,10 @@ public class MgmtHistory extends javax.swing.JPanel {
 //      LOAD CONTENTS
         ArrayList<History> history = sqlite.getHistory();
         for(int nCtr = 0; nCtr < history.size(); nCtr++){
-            Product product = sqlite.getProduct(history.get(nCtr).getName());
-            tableModel.addRow(new Object[]{
+            System.out.println(Login.username + " login username : ");
+            if(history.get(nCtr).getUsername().equals(Login.username)){
+                Product product = sqlite.getProduct(history.get(nCtr).getName());
+                tableModel.addRow(new Object[]{
                 history.get(nCtr).getUsername(), 
                 history.get(nCtr).getName(), 
                 history.get(nCtr).getStock(), 
@@ -57,6 +60,8 @@ public class MgmtHistory extends javax.swing.JPanel {
                 product.getPrice() * history.get(nCtr).getStock(), 
                 history.get(nCtr).getTimestamp()
             });
+            }
+            
         }
     }
     

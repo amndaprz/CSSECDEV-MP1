@@ -12,9 +12,9 @@ public class Login extends javax.swing.JPanel {
     public SQLite sqlite;
     
     public int attempts = 0;
-    public String username;
+    public static String username;
     public String password;
-    public int userRole;
+    public static int userRole;
     public static final int MAX_ATTEMPTS = 3;
     
     public Login() {
@@ -25,6 +25,10 @@ public class Login extends javax.swing.JPanel {
 
     }
 
+    public String getUsername(){
+        return username;
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
