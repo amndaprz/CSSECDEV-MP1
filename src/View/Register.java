@@ -2,6 +2,8 @@
 package View;
 import javax.swing.JOptionPane;
 import Controller.SQLite;
+import java.sql.Timestamp;
+import java.util.Date;
 
 public class Register extends javax.swing.JPanel {
     
@@ -145,6 +147,7 @@ public class Register extends javax.swing.JPanel {
         if(!sqlite.checkUsername(usernameFld.getText())){
             if (checkConfirm() && checkPasswordStrength()){
                 System.out.println(a + " " + b + " " + c);
+                sqlite.addLogs("NOTICE", usernameFld.getText(), "User creation successful", new Timestamp(new Date().getTime()).toString());
                 frame.registerAction(usernameFld.getText(),passwordFld.getText(),confpassFld.getText());
                 frame.loginNav();
 

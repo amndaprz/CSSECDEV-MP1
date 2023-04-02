@@ -28,6 +28,10 @@ public class MgmtProduct extends javax.swing.JPanel {
         tableModel = (DefaultTableModel)table.getModel();
         table.getTableHeader().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 14));
 
+        
+        System.out.println("UserRole = " + Login.userRole);
+      
+        
 //        UNCOMMENT TO DISABLE BUTTONS
 //        purchaseBtn.setVisible(false);
 //        addBtn.setVisible(false);
@@ -48,6 +52,28 @@ public class MgmtProduct extends javax.swing.JPanel {
                 products.get(nCtr).getName(), 
                 products.get(nCtr).getStock(), 
                 products.get(nCtr).getPrice()});
+        }
+        
+        // Roles
+        
+          switch(Login.userRole){
+            case 5:
+                // Case 4 -- Manager
+            case 4:
+                purchaseBtn.setVisible(false);
+                return;
+                // Case 3 -- Staff
+            case 3:
+                purchaseBtn.setVisible(false);
+                return;
+                // Case 2 -- Client
+            case 2: 
+                addBtn.setVisible(false);
+                editBtn.setVisible(false);
+                deleteBtn.setVisible(false);
+                return;
+            case 1:
+            case 0:
         }
     }
     
@@ -177,6 +203,8 @@ public class MgmtProduct extends javax.swing.JPanel {
         if(table.getSelectedRow() >= 0){
             JTextField stockFld = new JTextField("0");
             designer(stockFld, "PRODUCT STOCK");
+            
+            String prodName = tableModel.getValueAt(table.getSelectedRow(), 0).toString();
 
             Object[] message = {
                 "How many " + tableModel.getValueAt(table.getSelectedRow(), 0) + " do you want to purchase?", stockFld
@@ -186,6 +214,8 @@ public class MgmtProduct extends javax.swing.JPanel {
 
             if (result == JOptionPane.OK_OPTION) {
                 System.out.println(stockFld.getText());
+                int prodNum = Integer.parseInt(stockFld.getText());
+                sqlite.addHistory(Login.username, prodName, prodNum, "2019-04-03 14:30:02.000");
             }
         }
     }//GEN-LAST:event_purchaseBtnActionPerformed
@@ -206,10 +236,20 @@ public class MgmtProduct extends javax.swing.JPanel {
         int result = JOptionPane.showConfirmDialog(null, message, "ADD PRODUCT", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
 
         if (result == JOptionPane.OK_OPTION) {
-            System.out.println(nameFld.getText());
-            System.out.println(stockFld.getText());
-            System.out.println(priceFld.getText());
+//            System.out.println(nameFld.getText());
+//            System.out.println(stockFld.getText());
+//            System.out.println(priceFld.getText());
+            
+            String prodName = nameFld.getText();
+            int prodStock = Integer.parseInt(stockFld.getText());
+            float prodPrice = Float.parseFloat(priceFld.getText());
+            
+//            if prodName == somewhere in sqlite databaase
+//                prodStock += prodstock
+            
+            sqlite.addProduct(prodName,prodStock ,prodPrice );
         }
+        init();
     }//GEN-LAST:event_addBtnActionPerformed
 
     private void editBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editBtnActionPerformed
@@ -218,6 +258,11 @@ public class MgmtProduct extends javax.swing.JPanel {
             JTextField stockFld = new JTextField(tableModel.getValueAt(table.getSelectedRow(), 1) + "");
             JTextField priceFld = new JTextField(tableModel.getValueAt(table.getSelectedRow(), 2) + "");
 
+            String oldName = tableModel.getValueAt(table.getSelectedRow(), 0).toString();
+            int oldStock = Integer.parseInt( tableModel.getValueAt(table.getSelectedRow(), 1).toString() );
+            float oldPrice = Float.parseFloat(tableModel.getValueAt(table.getSelectedRow(), 2).toString() );
+            String temp = "";
+            
             designer(nameFld, "PRODUCT NAME");
             designer(stockFld, "PRODUCT STOCK");
             designer(priceFld, "PRODUCT PRICE");
@@ -229,10 +274,16 @@ public class MgmtProduct extends javax.swing.JPanel {
             int result = JOptionPane.showConfirmDialog(null, message, "EDIT PRODUCT", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
 
             if (result == JOptionPane.OK_OPTION) {
-                System.out.println(nameFld.getText());
-                System.out.println(stockFld.getText());
-                System.out.println(priceFld.getText());
+
+            String prodName = nameFld.getText();
+            int prodStock = Integer.parseInt(stockFld.getText());
+            float prodPrice = Float.parseFloat(priceFld.getText());
+            
+            System.out.println("Old Name -- " + oldName + " New Name -- " + prodName);
+            sqlite.updateProduct(prodName, prodStock, prodPrice, oldName, oldStock, oldPrice);
+
             }
+            init();
         }
     }//GEN-LAST:event_editBtnActionPerformed
 
@@ -242,7 +293,14 @@ public class MgmtProduct extends javax.swing.JPanel {
             
             if (result == JOptionPane.YES_OPTION) {
                 System.out.println(tableModel.getValueAt(table.getSelectedRow(), 0));
+                String prodName = tableModel.getValueAt(table.getSelectedRow(), 0).toString();
+                
+                sqlite.removeProduct(prodName);
+                
             }
+            
+            // Update
+            init();
         }
     }//GEN-LAST:event_deleteBtnActionPerformed
 

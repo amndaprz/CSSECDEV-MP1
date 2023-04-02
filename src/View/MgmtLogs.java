@@ -135,6 +135,10 @@ public class MgmtLogs extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void clearBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearBtnActionPerformed
+        for(int nCtr = tableModel.getRowCount(); nCtr > 0; nCtr--){
+            tableModel.removeRow(0);
+            sqlite.dropLogsTable();
+        }
         
     }//GEN-LAST:event_clearBtnActionPerformed
 

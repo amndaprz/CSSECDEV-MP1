@@ -189,6 +189,105 @@ public class SQLite {
         }
     }
     
+    public void updateRole(String name, int newRole) {
+        String sql = "UPDATE users SET role = ? WHERE username = ?";
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+            stmt.setInt(1, newRole);
+            stmt.setString(2, name);
+            stmt.executeUpdate();
+
+//            System.out.println("HERE");
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+    }
+    
+    public void updateLock(String name, int lockStatus) {
+        String sql = "UPDATE users SET locked = ? WHERE username = ?";
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+            stmt.setInt(1, lockStatus);
+            stmt.setString(2, name);
+            stmt.executeUpdate();
+
+//            System.out.println("HERE");
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+    }
+    
+      public void updatePassword(String name, String newPass) {
+        String sql = "UPDATE users SET password = ? WHERE username = ?";
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+            stmt.setString(1, newPass);
+            stmt.setString(2, name);
+            stmt.executeUpdate();
+
+//            System.out.println("HERE");
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+    }
+    
+    public void updateProduct(String name, int stock, double price, String oldName, int oldStock, double oldPrice) {
+        // Update Price -> Stock -> Name 
+        
+        if(price != oldPrice){
+            String sql = "UPDATE product SET price = ? WHERE name = ?";
+
+            try (Connection conn = DriverManager.getConnection(driverURL);
+                PreparedStatement stmt = conn.prepareStatement(sql)){
+                stmt.setDouble(1, price);
+                stmt.setString(2, oldName);
+                stmt.executeUpdate();
+                
+                System.out.println("HERE");
+            } catch (Exception ex) {
+                System.out.print(ex);
+            }
+        } 
+        
+        
+        if(stock != oldStock){
+            String sql = "UPDATE product SET stock = ? WHERE name = ?";
+
+            try (Connection conn = DriverManager.getConnection(driverURL);
+                PreparedStatement stmt = conn.prepareStatement(sql)){
+                stmt.setInt(1, stock);
+                stmt.setString(2, oldName);
+                stmt.executeUpdate();
+                
+                System.out.println("HERE");
+            } catch (Exception ex) {
+                System.out.print(ex);
+            }
+        } 
+        
+        // Name
+        if(!name.equals(oldName)){
+            String sql = "UPDATE product SET name = ? WHERE name = ?";
+
+            try (Connection conn = DriverManager.getConnection(driverURL);
+                PreparedStatement stmt = conn.prepareStatement(sql)){
+                stmt.setString(1, name);
+                stmt.setString(2, oldName);
+                stmt.executeUpdate();
+                
+                System.out.println("HERE");
+            } catch (Exception ex) {
+                System.out.print(ex);
+            }
+        } 
+         
+    }
+    
+  
+    
     public void addUser(String username, String password) {
         String sql = "INSERT INTO users(username,password) VALUES('" + username + "','" + password + "')";
         
@@ -447,6 +546,19 @@ public class SQLite {
             System.out.print(ex);
         }
     }
+    
+    public void removeProduct(String product) {
+        String sql = "DELETE FROM product WHERE name='" + product + "';";
+
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+            System.out.println("Product " + product + " has been deleted.");
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+    }
+    
     
     public Product getProduct(String name){
         String sql = "SELECT name, stock, price FROM product WHERE name='" + name + "';";

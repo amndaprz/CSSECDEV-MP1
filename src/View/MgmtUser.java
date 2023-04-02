@@ -191,8 +191,19 @@ public class MgmtUser extends javax.swing.JPanel {
             if(result != null){
                 System.out.println(tableModel.getValueAt(table.getSelectedRow(), 0));
                 System.out.println(result.charAt(0));
+                
+                String newRoleStr = Character.toString(result.charAt(0));
+                
+                String name = tableModel.getValueAt(table.getSelectedRow(), 0).toString();
+
+                
+                int newRole = Integer.parseInt(newRoleStr);
+                System.out.println("New Role = " + newRole);
+                sqlite.updateRole(name,newRole);
             }
+            
         }
+        init();
     }//GEN-LAST:event_editRoleBtnActionPerformed
 
     private void deleteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtnActionPerformed
@@ -201,23 +212,40 @@ public class MgmtUser extends javax.swing.JPanel {
             
             if (result == JOptionPane.YES_OPTION) {
                 System.out.println(tableModel.getValueAt(table.getSelectedRow(), 0));
+                
+                String name = tableModel.getValueAt(table.getSelectedRow(), 0).toString();
+                sqlite.removeUser(name);
             }
         }
+        init();
     }//GEN-LAST:event_deleteBtnActionPerformed
 
     private void lockBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lockBtnActionPerformed
+        String status = "" ;
         if(table.getSelectedRow() >= 0){
             String state = "lock";
             if("1".equals(tableModel.getValueAt(table.getSelectedRow(), 3) + "")){
                 state = "unlock";
             }
             
+            status = state;
             int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to " + state + " " + tableModel.getValueAt(table.getSelectedRow(), 0) + "?", "DELETE USER", JOptionPane.YES_NO_OPTION);
             
             if (result == JOptionPane.YES_OPTION) {
                 System.out.println(tableModel.getValueAt(table.getSelectedRow(), 0));
+                String name = tableModel.getValueAt(table.getSelectedRow(), 0).toString();
+                
+                System.out.println("Status = " + status);
+                if(status.equals("lock")){
+                    int lock = 1;
+                    sqlite.updateLock(name, lock);
+                }else {
+                    int lock = 0;
+                    sqlite.updateLock(name, lock);
+                }
             }
         }
+        init();
     }//GEN-LAST:event_lockBtnActionPerformed
 
     private void chgpassBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chgpassBtnActionPerformed
@@ -236,8 +264,17 @@ public class MgmtUser extends javax.swing.JPanel {
             if (result == JOptionPane.OK_OPTION) {
                 System.out.println(password.getText());
                 System.out.println(confpass.getText());
+                String pass = password.getText();
+                String confPass = confpass.getText();
+                String name = tableModel.getValueAt(table.getSelectedRow(), 0).toString();
+                
+                if(pass.equals(confPass)){
+                    sqlite.updatePassword(name,pass);
+                }
+
             }
         }
+        init();
     }//GEN-LAST:event_chgpassBtnActionPerformed
 
 

@@ -48,21 +48,37 @@ public class MgmtHistory extends javax.swing.JPanel {
         
 //      LOAD CONTENTS
         ArrayList<History> history = sqlite.getHistory();
-        for(int nCtr = 0; nCtr < history.size(); nCtr++){
-            System.out.println(Login.username + " login username : ");
-            if(history.get(nCtr).getUsername().equals(Login.username)){
+        
+        if(Login.userRole == 4){
+            for(int nCtr = 0; nCtr < history.size(); nCtr++){
+               
                 Product product = sqlite.getProduct(history.get(nCtr).getName());
                 tableModel.addRow(new Object[]{
-                history.get(nCtr).getUsername(), 
-                history.get(nCtr).getName(), 
-                history.get(nCtr).getStock(), 
-                product.getPrice(), 
-                product.getPrice() * history.get(nCtr).getStock(), 
-                history.get(nCtr).getTimestamp()
-            });
+                    history.get(nCtr).getUsername(), 
+                    history.get(nCtr).getName(), 
+                    history.get(nCtr).getStock(), 
+                    product.getPrice(), 
+                    product.getPrice() * history.get(nCtr).getStock(), 
+                    history.get(nCtr).getTimestamp()
+                });
+                    
             }
-            
+        }else {
+            for(int nCtr = 0; nCtr < history.size(); nCtr++){
+                if(history.get(nCtr).getUsername().equals(Login.username)){
+                    Product product = sqlite.getProduct(history.get(nCtr).getName());
+                    tableModel.addRow(new Object[]{
+                        history.get(nCtr).getUsername(), 
+                        history.get(nCtr).getName(), 
+                        history.get(nCtr).getStock(), 
+                        product.getPrice(), 
+                        product.getPrice() * history.get(nCtr).getStock(), 
+                        history.get(nCtr).getTimestamp()
+                    });
+                }     
+            }
         }
+        
     }
     
     public void designer(JTextField component, String text){
