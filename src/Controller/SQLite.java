@@ -15,21 +15,48 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
-    
 
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 public class SQLite {
     
     public int DEBUG_MODE = 0;
     String driverURL = "jdbc:sqlite:" + "database.db";
     public static int MAX_LOGS = 3;
+    SecureRandom random = new SecureRandom();
+    
+        
+    
+    public String hashPassword(String pw) throws NoSuchAlgorithmException{
+         // Combine the password and salt
+        byte[] combined = new byte[pw.getBytes().length];
+        System.arraycopy(pw.getBytes(), 0, combined, 0, pw.getBytes().length);
+
+        // Hash the combined value using MD5
+        MessageDigest sha = MessageDigest.getInstance("SHA-256");
+        byte[] hashed = sha.digest(combined);
+
+        // Convert to hex string so we can store it as text
+        StringBuilder sb = new StringBuilder();
+        for (byte b : hashed) {
+          sb.append(String.format("%02x", b));
+        }
+        
+         System.out.print(sb.toString());
+
+        return sb.toString();
+    }
+
     
     public void createNewDatabase() {
         try (Connection conn = DriverManager.getConnection(driverURL)) {
             if (conn != null) {
                 DatabaseMetaData meta = conn.getMetaData();
                 System.out.println("Database database.db created.");
+                
             }
         } catch (Exception ex) {
             System.out.print(ex);
@@ -52,6 +79,8 @@ public class SQLite {
         } catch (Exception ex) {
             System.out.print(ex);
         }
+        
+        
     }
     
     public void createLogsTable() {
@@ -289,7 +318,13 @@ public class SQLite {
   
     
     public void addUser(String username, String password) {
-        String sql = "INSERT INTO users(username,password) VALUES('" + username + "','" + password + "')";
+        String temp = password;
+        try{
+            temp = hashPassword(password);
+        } catch (Exception ex) {
+             System.out.print(ex);
+        }
+        String sql = "INSERT INTO users(username,password) VALUES('" + username + "','" + temp + "')";
         
         try (Connection conn = DriverManager.getConnection(driverURL);
             Statement stmt = conn.createStatement()){
@@ -410,10 +445,19 @@ public class SQLite {
      
      
     //returns false if unsuccesful login, true if successful
-    public boolean checkUsers(String username, String password){
+    public boolean checkUsers(String username, String password) {
         String sql = "SELECT id, username, password, role, locked, locktimer FROM users";
         ArrayList<User> users = new ArrayList<User>();
-       
+        String temp = password;
+        try{
+//        Hash of password
+            temp = hashPassword(password);
+            
+        } catch (NoSuchAlgorithmException ex){
+            System.out.println(ex);
+        }
+       System.out.println();
+       System.out.println(temp);
        try (Connection conn = DriverManager.getConnection(driverURL);
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql)){
@@ -432,7 +476,7 @@ public class SQLite {
                                 
                                 return false;
                             } else{
-                                if(rs.getString("password").equals(password)){
+                                if(rs.getString("password").equals(temp)){
                                       //Successful login
                                     //Reset log
                                     String update = "UPDATE users SET locked = ? WHERE username = ?";
@@ -448,7 +492,7 @@ public class SQLite {
                             }
                         }
                     //User exists, wrong password
-                        if(!rs.getString("password").equals(password)){
+                        if(!rs.getString("password").equals(temp)){
                             //if max logs, add timer
                             if (rs.getInt("locked") == MAX_LOGS-1){
                             // Set lock timer
@@ -524,7 +568,14 @@ public class SQLite {
     }
     
     public void addUser(String username, String password, int role) {
-        String sql = "INSERT INTO users(username,password,role) VALUES('" + username + "','" + password + "','" + role + "')";
+        String temp = password;
+         try{
+            temp = hashPassword(password);
+        } catch (Exception ex) {
+             System.out.print(ex);
+        }
+        
+        String sql = "INSERT INTO users(username,password,role) VALUES('" + username + "','" + temp + "','" + role + "')";
         
         try (Connection conn = DriverManager.getConnection(driverURL);
             Statement stmt = conn.createStatement()){
