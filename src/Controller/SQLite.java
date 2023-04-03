@@ -19,25 +19,18 @@ import java.util.Date;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 
 public class SQLite {
     
     public int DEBUG_MODE = 0;
     String driverURL = "jdbc:sqlite:" + "database.db";
     public static int MAX_LOGS = 3;
-    SecureRandom random = new SecureRandom();
     
         
     
     public String hashPassword(String pw) throws NoSuchAlgorithmException{
-         // Combine the password and salt
-        byte[] combined = new byte[pw.getBytes().length];
-        System.arraycopy(pw.getBytes(), 0, combined, 0, pw.getBytes().length);
-
-        // Hash the combined value using MD5
         MessageDigest sha = MessageDigest.getInstance("SHA-256");
-        byte[] hashed = sha.digest(combined);
+        byte[] hashed = sha.digest(pw.getBytes());
 
         // Convert to hex string so we can store it as text
         StringBuilder sb = new StringBuilder();

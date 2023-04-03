@@ -240,14 +240,27 @@ public class MgmtProduct extends javax.swing.JPanel {
 //            System.out.println(stockFld.getText());
 //            System.out.println(priceFld.getText());
             
-            String prodName = nameFld.getText();
-            int prodStock = Integer.parseInt(stockFld.getText());
-            float prodPrice = Float.parseFloat(priceFld.getText());
+            if(!nameFld.getText().isEmpty() && !stockFld.getText().isEmpty() && !priceFld.getText().isEmpty()){
+                String prodName = nameFld.getText();
+                int prodStock = Integer.parseInt(stockFld.getText());
+                float prodPrice = Float.parseFloat(priceFld.getText());
+                Product tempProd = sqlite.getProduct(prodName);
             
-//            if prodName == somewhere in sqlite databaase
-//                prodStock += prodstock
+                // Does not accept single quote, double quote, < , > ,;, &, --
+                if (prodName.matches("/^(?!.*[-]{2}|.*[']|.*[\"]|.*[_]|.*[%]|.*[&]|.*[<]|.*[>]).*$")){
+    //            if prodName == somewhere in sqlite databaase
+    //                prodStock += prodstock
+                    if(tempProd != null)
+                        System.out.println("Product not Added. Invalid Input");
+                    else
+                        sqlite.addProduct(prodName,prodStock ,prodPrice );
+        
+                }else
+                    System.out.println("Product not Added. Invalid Input");
             
-            sqlite.addProduct(prodName,prodStock ,prodPrice );
+            }else
+                System.out.println("Product not Added. Invalid Input");
+            
         }
         init();
     }//GEN-LAST:event_addBtnActionPerformed
@@ -274,13 +287,29 @@ public class MgmtProduct extends javax.swing.JPanel {
             int result = JOptionPane.showConfirmDialog(null, message, "EDIT PRODUCT", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
 
             if (result == JOptionPane.OK_OPTION) {
+                
+                if(!nameFld.getText().isEmpty() && !stockFld.getText().isEmpty() && !priceFld.getText().isEmpty()){
 
-            String prodName = nameFld.getText();
-            int prodStock = Integer.parseInt(stockFld.getText());
-            float prodPrice = Float.parseFloat(priceFld.getText());
-            
-            System.out.println("Old Name -- " + oldName + " New Name -- " + prodName);
-            sqlite.updateProduct(prodName, prodStock, prodPrice, oldName, oldStock, oldPrice);
+                    String prodName = nameFld.getText();
+                    int prodStock = Integer.parseInt(stockFld.getText());
+                    float prodPrice = Float.parseFloat(priceFld.getText());
+                    Product tempProd = sqlite.getProduct(oldName);
+
+                    System.out.println("Old Name -- " + oldName + " New Name -- " + prodName);
+                    if (prodName.matches("/^(?!.*[-]{2}|.*[']|.*[\"]|.*[_]|.*[%]|.*[&]|.*[<]|.*[>]).*$")){
+                    System.out.println("Updating...");
+                    if(tempProd != null)
+                        sqlite.updateProduct(prodName, prodStock, prodPrice, oldName, oldStock, oldPrice);
+                    else
+                        System.out.println("Product not Updated. Invalid Input");
+                    }
+                    else
+                        System.out.println("Product not Updated. Invalid Input"); 
+                    
+                }
+                else
+                    System.out.println("Product not Updated. Invalid Input"); 
+                    
 
             }
             init();
