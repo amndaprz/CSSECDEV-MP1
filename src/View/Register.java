@@ -137,16 +137,15 @@ public class Register extends javax.swing.JPanel {
     }
     private void registerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerBtnActionPerformed
         
-        boolean a,b,c;
-        a = checkConfirm();
-        b = checkPasswordStrength();
         System.out.println(usernameFld.getText());
         String d = usernameFld.getText();
-        c = sqlite.checkUsername(d);
         
-        if(!sqlite.checkUsername(usernameFld.getText())){
+        
+        if (usernameFld.getText().matches("/^(?!.*[-]{2}|.*[']|.*[\"]|.*[_]|.*[%]|.*[&]|.*[<]|.*[>]).*$") && passwordFld.getText().matches("/^(?!.*[-]{2}|.*[']|.*[\"]|.*[_]|.*[%]|.*[&]|.*[<]|.*[>]).*$")){
+            JOptionPane.showMessageDialog(null, message_default);
+        }
+        else if(!sqlite.checkUsername(usernameFld.getText())){
             if (checkConfirm() && checkPasswordStrength()){
-                System.out.println(a + " " + b + " " + c);
                 sqlite.addLogs("NOTICE", usernameFld.getText(), "User creation successful", new Timestamp(new Date().getTime()).toString());
                 frame.registerAction(usernameFld.getText(),passwordFld.getText(),confpassFld.getText());
                 frame.loginNav();

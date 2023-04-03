@@ -122,6 +122,8 @@ public class Login extends javax.swing.JPanel {
             //dialog box cannot be empty
              JOptionPane.showMessageDialog(null, "Fields cannot be empty");
             
+        } else if (username.matches("/^(?!.*[-]{2}|.*[']|.*[\"]|.*[_]|.*[%]|.*[&]|.*[<]|.*[>]).*$") && password.matches("/^(?!.*[-]{2}|.*[']|.*[\"]|.*[_]|.*[%]|.*[&]|.*[<]|.*[>]).*$")){
+            JOptionPane.showMessageDialog(null, "Login Failed: Invalid username/password");
         }else{
             authResult = sqlite.checkUsers(username, password);
             
