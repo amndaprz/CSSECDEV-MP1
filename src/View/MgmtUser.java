@@ -262,15 +262,23 @@ public class MgmtUser extends javax.swing.JPanel {
             int result = JOptionPane.showConfirmDialog(null, message, "CHANGE PASSWORD", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
             
             if (result == JOptionPane.OK_OPTION) {
-                System.out.println(password.getText());
-                System.out.println(confpass.getText());
-                String pass = password.getText();
-                String confPass = confpass.getText();
-                String name = tableModel.getValueAt(table.getSelectedRow(), 0).toString();
                 
-                if(pass.equals(confPass)){
-                    sqlite.updatePassword(name,pass);
-                }
+                if(!password.getText().isEmpty() && !confpass.getText().isEmpty()){
+                    System.out.println(password.getText());
+                    System.out.println(confpass.getText());
+                    String pass = password.getText();
+                    String confPass = confpass.getText();
+                    String name = tableModel.getValueAt(table.getSelectedRow(), 0).toString();
+
+                    if(pass.equals(confPass)){
+                        if(pass.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=_!])(?=\\S+$).{8,}$"))
+                            sqlite.updatePassword(name,pass);
+                        else
+                            System.out.println("Password not updated. Invalid input.");
+                    }else
+                            System.out.println("Password not updated. Invalid input.");
+                }else
+                            System.out.println("Password not updated. Invalid input.");
 
             }
         }

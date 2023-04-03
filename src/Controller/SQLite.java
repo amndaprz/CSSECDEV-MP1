@@ -38,7 +38,6 @@ public class SQLite {
           sb.append(String.format("%02x", b));
         }
         
-         System.out.print(sb.toString());
 
         return sb.toString();
     }
@@ -243,10 +242,17 @@ public class SQLite {
     
       public void updatePassword(String name, String newPass) {
         String sql = "UPDATE users SET password = ? WHERE username = ?";
+        String temp = newPass;
         
+        try{
+            temp = hashPassword(newPass);
+        }catch (Exception ex){
+            System.out.println(ex);
+        }
+               
         try (Connection conn = DriverManager.getConnection(driverURL);
             PreparedStatement stmt = conn.prepareStatement(sql)){
-            stmt.setString(1, newPass);
+            stmt.setString(1, temp);
             stmt.setString(2, name);
             stmt.executeUpdate();
 
@@ -268,7 +274,7 @@ public class SQLite {
                 stmt.setString(2, oldName);
                 stmt.executeUpdate();
                 
-                System.out.println("HERE");
+//                System.out.println("HERE");
             } catch (Exception ex) {
                 System.out.print(ex);
             }
@@ -284,7 +290,7 @@ public class SQLite {
                 stmt.setString(2, oldName);
                 stmt.executeUpdate();
                 
-                System.out.println("HERE");
+//                System.out.println("HERE");
             } catch (Exception ex) {
                 System.out.print(ex);
             }
@@ -300,7 +306,7 @@ public class SQLite {
                 stmt.setString(2, oldName);
                 stmt.executeUpdate();
                 
-                System.out.println("HERE");
+//                System.out.println("HERE");
             } catch (Exception ex) {
                 System.out.print(ex);
             }
@@ -317,18 +323,15 @@ public class SQLite {
         } catch (Exception ex) {
              System.out.print(ex);
         }
-        String sql = "INSERT INTO users(username,password) VALUES('" + username + "','" + temp + "')";
-        
+          
+            String sql = "INSERT INTO users(username,password) VALUES(?,?)";
         try (Connection conn = DriverManager.getConnection(driverURL);
-            Statement stmt = conn.createStatement()){
-            stmt.execute(sql);
             
 //      PREPARED STATEMENT EXAMPLE
-//      String sql = "INSERT INTO users(username,password) VALUES(?,?)";
-//      PreparedStatement pstmt = conn.prepareStatement(sql)) {
-//      pstmt.setString(1, username);
-//      pstmt.setString(2, password);
-//      pstmt.executeUpdate();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            pstmt.executeUpdate();
         } catch (Exception ex) {
             System.out.print(ex);
         }
@@ -449,20 +452,18 @@ public class SQLite {
         } catch (NoSuchAlgorithmException ex){
             System.out.println(ex);
         }
-       System.out.println();
-       System.out.println(temp);
        try (Connection conn = DriverManager.getConnection(driverURL);
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql)){
             
             while (rs.next()) {
-                System.out.println("username: " + username + " pass: " +  password);
-                System.out.println("db_user: " + rs.getString("username") + " db_pass: " + rs.getString("password"));
+//                System.out.println("username: " + username + " pass: " +  password);
+//                System.out.println("db_user: " + rs.getString("username") + " db_pass: " + rs.getString("password"));
                
                  if(rs.getString("username").equals(username)){
                      //User exists, whether correct password or not
                       String lockstr= rs.getString("locktimer");
-                      System.out.println("lock str = " + lockstr);
+//                      System.out.println("lock str = " + lockstr);
                         if (lockstr != null) {
                             Timestamp checkLocked = Timestamp.valueOf(lockstr);
                             if (Instant.now().isBefore(checkLocked.toInstant())) {
@@ -531,7 +532,7 @@ public class SQLite {
 
                             int n_rows = pstmt.executeUpdate();
                             pstmt.close();
-                             System.out.println("user found CORRECT");
+//                             System.out.println("user found CORRECT");
                             return true;
                         }
                  }
