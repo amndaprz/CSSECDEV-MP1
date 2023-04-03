@@ -262,6 +262,25 @@ public class SQLite {
         }
     }
     
+      public void updatePurchaseProduct(String name, int stock) {
+        // Update  Stock 
+        String sql = "UPDATE product SET stock = ? WHERE name = ?";
+
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+            stmt.setInt(1, stock);
+            stmt.setString(2, name);
+            stmt.executeUpdate();
+
+//                System.out.println("HERE");
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+
+         
+    }
+      
+      
     public void updateProduct(String name, int stock, double price, String oldName, int oldStock, double oldPrice) {
         // Update Price -> Stock -> Name 
         

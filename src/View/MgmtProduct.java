@@ -215,9 +215,18 @@ public class MgmtProduct extends javax.swing.JPanel {
             if (result == JOptionPane.OK_OPTION) {
                 System.out.println(stockFld.getText());
                 int prodNum = Integer.parseInt(stockFld.getText());
-                sqlite.addHistory(Login.username, prodName, prodNum, "2019-04-03 14:30:02.000");
+                int oldStock = Integer.parseInt(tableModel.getValueAt(table.getSelectedRow(), 1).toString());
+                int newStock = oldStock - prodNum;
+                
+                if(oldStock >= prodNum){
+                    sqlite.addHistory(Login.username, prodName, prodNum, "2019-04-03 14:30:02.000");
+                    sqlite.updatePurchaseProduct(prodName, newStock);
+                }
+               
             }
         }
+        
+        init();
     }//GEN-LAST:event_purchaseBtnActionPerformed
 
     private void addBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBtnActionPerformed
